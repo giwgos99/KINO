@@ -10,3 +10,4 @@ class KinoLogic:
     def draw_winning_numbers():
         """Κληρώνει τους 20 νικητήριους αριθμούς"""
         return random.sample(range(1, 81), 20)
+
