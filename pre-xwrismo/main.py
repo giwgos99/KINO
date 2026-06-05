@@ -5,8 +5,6 @@ import time
 import random
 from random import randint
 
-
-
 class KinoGUI:
     def __init__(self, root):
         self.root = root

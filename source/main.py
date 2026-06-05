@@ -1,8 +1,7 @@
+import json
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
-import time
-
 from kino_logic import KinoLogic
 from kino_db import KinoDB
 from kino_gui import KinoGUI 
@@ -22,6 +21,17 @@ class MainController:
         self.ask_initial_wallet()
         self.ask_initial_time_between_draws()
 
+        try:
+            with open("payouts.json", "r", encoding="utf-8") as f:
+                self.payouts_table = json.load(f)
+
+        except Exception as e:
+            messagebox.showerror(
+                "Κρίσιμο Σφάλμα",
+                f"Αποτυχία φόρτωσης πίνακα κερδών:\n{e}")
+            self.root.destroy()
+
+
     def ask_initial_wallet(self):
         """Εμφανίζει pop-up για κατάθεση. Αν δεν βάλει χρήματα, κλείνει το παιχνίδι."""
         deposit = 0.0
@@ -36,8 +46,8 @@ class MainController:
             
             if deposit is None:
                 messagebox.showinfo("Έξοδος", "Πρέπει να κάνετε κατάθεση για να παίξετε. Κλείσιμο εφαρμογής.")
-                self.ask_initial_wallet()
-                return 
+                self.root.destroy()
+
             
         # Ενημερώνουμε τη βάση δεδομένων με το ποσό και το UI
         self.db.wallet = deposit
@@ -104,6 +114,16 @@ class MainController:
         except ValueError:
             messagebox.showerror("Σφάλμα", "Παρακαλώ ελέγξτε αν οι τιμές στα πεδία είναι σωστές.")
 
+    #Υπολογισμός των κερδών με βάση τα νούμερα που κερδίζουν επί τον πολλαπλασιαστή στο json
+    def calculate_win(self, played_count, hits, bet_amount):
+
+        multiplier = (
+            self.payouts_table
+            .get(str(played_count), {})
+            .get(str(hits), 0)
+        )
+        return multiplier * bet_amount
+
     def run_lottery_cycle(self):
         """Εκτελεί μια κλήρωση και προγραμματίζει την επόμενη αντίστροφη μέτρηση"""
         if self.remaining_draws > 0:
@@ -140,10 +160,13 @@ class MainController:
                     # Μειώνουμε τις κληρώσεις του δελτίου
                     ticket_data["draws"] -= 1
 
-                    # Απλοποιημένη Λογική Κέρδους (Πληρώνει αν πιάσεις τα μισά και πάνω)
-                    win_amount = 0.0
-                    if num_hits > 0 and num_hits >= len(played_nums) / 2:
-                        win_amount = self.bet_amount * num_hits * 2 # Απλό παράδειγμα απόδοσης
+                    played_count = len(played_nums)
+
+                    win_amount = self.calculate_win(
+                        played_count,
+                        num_hits,
+                        self.bet_amount
+                    )
 
                     # Καταγραφή Ιστορικού & Πληρωμή
                     if win_amount > 0:

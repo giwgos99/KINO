@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import *
-from tktooltip import ToolTip # Εξωτερική βιβλιοθήκη για tooltips, εγκατάσταση με: pip install tkinter-tooltip
+from TkToolTip import ToolTip # Εξωτερική βιβλιοθήκη για tooltips, εγκατάσταση με: pip install tkinter-tooltip
 
 class KinoGUI:
     def __init__(self, root, controller):
@@ -42,9 +42,9 @@ class KinoGUI:
         settings_frame = tk.Frame(self.root, bg="#003366", padx=15, pady=15, highlightbackground="#ffcc00", highlightthickness=1)
         settings_frame.pack(pady=5, fill="x", padx=40)
 
-        # ΝΕΟ: Αόρατο εσωτερικό frame για να κεντράρουμε τα στοιχεία!
+        # ΝΕΟ: Αόρατο εσωτερικό frame για να κεντράρουμε τα στοιχεία
         eswteriko_settings_frame = tk.Frame(settings_frame, bg="#003366")
-        eswteriko_settings_frame.pack(anchor="center") # Το μαγικό που τα φέρνει όλα στη μέση
+        eswteriko_settings_frame.pack(anchor="center")
 
         # --- 1. Πορτοφόλι ---
         self.wallet_icon_label = tk.Label(eswteriko_settings_frame, image=self.icons.get("wallet"), bg="#003366")
@@ -264,7 +264,7 @@ class KinoGUI:
         # Δημιουργία του αναδυόμενου παραθύρου
         popup = tk.Toplevel(self.root)
         popup.title("Νέο Δελτίο")
-        popup.geometry("500x500")
+        popup.geometry("800x500")
         popup.configure(bg="#001a33")
         
         # Αυτό το κάνει "Modal" (δεν μπορείς να πατήσεις πίσω μέχρι να το κλείσεις)
