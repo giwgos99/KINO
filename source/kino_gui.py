@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 from tkinter import *
 from tktooltip import ToolTip # Εξωτερική βιβλιοθήκη για tooltips, εγκατάσταση με: pip install tkinter-tooltip
 
@@ -24,15 +25,24 @@ class KinoGUI: # Η κλάση του KinoGui
     def setup_ui(self):
         # Αρχκά εισάγονται τα εικονίδια που θα χρησιμοποιηθούν στην εφαρμογη έτσι ώστε να 
         # χρησιμοποιείται εύκολα και γρήγορα και να μη χρειάζεται κάθε φορά να γράφουμε το path 
+        # Βρίσκουμε το απόλυτο μονοπάτι του φακέλου που περιέχει αυτό το αρχείο Python
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Φτιάχνουμε το δυναμικό μονοπάτι για τον φάκελο "icons"
+        icons_dir = os.path.join(current_dir, "icons")
+
         try:
-            self.icons["wallet"] = tk.PhotoImage(file="./icons/icon-wallet.png").subsample(15, 15)
-            self.icons["bet"] = tk.PhotoImage(file="./icons/icon-bet.png").subsample(12, 12)
-            self.icons["clock"] = tk.PhotoImage(file="./icons/icon-clock.png").subsample(17, 17)
-            self.icons["number_of_games"] = tk.PhotoImage(file="./icons/icon-number_of_games.png").subsample(15, 15)
-            self.icons["yellow_circle"] = tk.PhotoImage(file="./icons/icon-yellow-circle.png").subsample(11, 11)
-            self.icons["blue-circle"] = tk.PhotoImage(file="./icons/icon-blue-circle.png").subsample(13, 13)
-        except tk.TclError:
-            pass
+            self.icons["wallet"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-wallet.png")).subsample(15, 15)
+            self.icons["bet"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-bet.png")).subsample(12, 12)
+            self.icons["clock"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-clock.png")).subsample(17, 17)
+            self.icons["number_of_games"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-number_of_games.png")).subsample(15, 15)
+            self.icons["yellow_circle"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-yellow-circle.png")).subsample(11, 11)
+            self.icons["blue-circle"] = tk.PhotoImage(file=os.path.join(icons_dir, "icon-blue-circle.png")).subsample(13, 13)
+            
+        except tk.TclError as e:
+            #  To error που θα εμφανιστεί σε περίπτωση που δεν βρεθούν τα εικονίδια ή υπάρχει 
+            # πρόβλημα με την φόρτωσή τους
+            print(f"Προσοχή: Αποτυχία φόρτωσης εικονιδίων. {e}")
 
         self.aorato_pixel = tk.PhotoImage(width=1, height=1) # Τοποθετούμε ένα "αόρατο" pixel που θα 
         #χρησιμοποιηθεί αργότερα για να καλύψει μέρος των εικονιδίων
