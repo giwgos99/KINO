@@ -4,7 +4,16 @@ import os
 class KinoDB: # Η κλάση βάσης δεδομένων του ΚΙΝΟ
     def __init__(self):
         self.wallet = 0.0 # Το αρχικό ποσό του χρήστη στο πορτοφόλι είναι 0
-        self.history_file = "kino_draw_history.json" # Το αρχείο που θα σώζονται οι κληρώσεις
+        # Βρίσκουμε τον τρέχοντα φάκελο
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.data_dir = os.path.join(current_dir, "data") # Το τωρινό μονοπάτι του φακέλου data, όπου θα αποθηκεύονται τα δεδομένα του ιστορικού των κληρώσεων
+        # Αν δεν υπαρχει ο φάκελος, τον φτιάχνουμε για να μην δημιουρηθεί σφάλμα. Επίσης, με το
+        # exist_ok=True σημαίνει ότι αν ο φάκελος υπάρχει ήδη, να μην πετάξει σφάλμα.
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Ορίζουμε το τελικό μονοπάτι του αρχείου ΜΕΣΑ στον φάκελο data
+        self.history_file = os.path.join(self.data_dir, "kino_draw_history.json")
+
         self.draws = self.load_draws() # Φορτώνει το ιστορικό αν υπάρχει ήδη
 
     def load_draws(self):
