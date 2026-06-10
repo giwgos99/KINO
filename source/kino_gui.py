@@ -202,61 +202,63 @@ class KinoGUI: # Η κλάση του KinoGui
         # Εμφανίζει ή κρύβει το μενού της τυχαίας επιλογής
         # Το winfo_ismapped() μας λέει αν το frame φαίνεται αυτή τη στιγμή
         if not self.random_opt_frame.winfo_ismapped():
-            # Αν δεν φαίνεται, το βάζουμε να εμφανιστεί ΑΜΕΣΩΣ ΜΕΤΑ (after) το κουμπί ΤΥΧΑΙΑ ΕΠΙΛΟΓΗ
+            # Αν δεν φαίνεται, το βάζουμε να εμφανιστεί δεξιά του κουμπιού ΤΥΧΑΙΑ ΕΠΙΛΟΓΗ
             self.random_opt_frame.pack(side="left", after=self.random_btn, padx=(0, 10))
         else:
-            # Αν φαίνεται ήδη, το ξανακρύβουμε!
+            # Αν φαίνεται ήδη, το κρύβει
             self.random_opt_frame.pack_forget()
 
     def confirm_random_pick(self):
-        """Διαβάζει τον αριθμό και δίνει εντολή στον controller"""
+        # Διαβάζει τον αριθμό και δίνει εντολή στον controller να φτιάξει ένα τυχαίο δελτίο με βάση τις επιλογές του χρήστη
         try:
             count = int(self.random_spinbox.get())
-            if count < 1 or count > 12:
+            if count < 1 or count > 12: # Σε περίπτωση που ο χρήστης έχει δώσει τιμή εκτός ορίων, 
+                #εμφανίζει προειδοποίηση και επιστρέφει χωρίς να κάνει τίποτα
                 raise ValueError
-        except ValueError:
+        except ValueError: # Το μήνυμα που θα εμφανίζει αν ο χρήστης έκανε το παραπάνω σφάλμα
             from tkinter import messagebox
             messagebox.showwarning("Προσοχή", "Επιλέξτε από 1 έως 12 αριθμούς.")
             return
         
-        try:
+        try: # Ελέγχουμε αν οι κληρώσεις που έχει δώσει ο χρήστης είναι έγκυρος αριθμός 
+            # και αν είναι μέσα στα όρια (1-200)
             draws = int(self.random_opt_draws_spinbox.get())
             if draws < 1 or draws > 200:
                 raise ValueError
-        except ValueError:
+        except ValueError: # Αλλιώς επιστρέφει error
             from tkinter import messagebox
             messagebox.showwarning("Προσοχή", "Επιλέξτε από 1 έως 200 κληρώσεις.")
             return
             
-        # 1. Στέλνουμε τον αριθμό (π.χ. 6) και τις κληρώσεις (π.χ. 10) στον Controller!
+        # Στέλνουμε τον αριθμό (π.χ. 6) και τις κληρώσεις (π.χ. 10) στον Controller
         self.controller.random_pick(count, draws)
         
-        # 2. Κρύβουμε πάλι το μενού για να είναι καθαρή η οθόνη
+        # Κρύβουμε πάλι το μενού στο γραφικό περιβάλλον
         self.random_opt_frame.pack_forget()
 
     def add_ticket_to_sidebar(self, numbers, draws=1):
-        """Κεντρική συνάρτηση που προσθέτει ένα έτοιμο δελτίο στη δεξιά μπάρα"""
+        # Κεντρική συνάρτηση που προσθέτει ένα έτοιμο δελτίο στη δεξιά μπάρα
         # Αποθηκεύουμε το δελτίο στη λίστα μας
         
         deltio = {"arithmoi": sorted(numbers), "draws": draws}
         self.paigmena_deltia[len(self.paigmena_deltia) + 1] = deltio
         ticket_number = len(self.paigmena_deltia)
         
-        # Φτιάχνουμε το κείμενο (π.χ. 4 - 15 - 22 - 67)
+        # Φτιάχνουμε το κείμενο που θα εμφανίζεται στο δελτίο(π.χ. 4 - 15 - 22 - 67)
         nums_str = " - ".join(str(n) for n in sorted(numbers))
         
-        # Το ζωγραφίζουμε στη Sidebar!
+        # Το εμφανίζει στο sidebar των δελτίων
         tk.Label(self.tickets_display, text=f"Δελτίο {ticket_number} (Κληρώσεις που απομένουν: {draws} ):\n{nums_str}", 
                  font=("Arial", 10, "bold"), bg="#003366", fg="#00ffcc", 
                  relief="solid", borderwidth=1, padx=5, pady=5).pack(fill="x", pady=5)
 
     def refresh_sidebar_tickets(self):
-        """Καθαρίζει τη sidebar και ξαναζωγραφίζει τα ενεργά δελτία"""
-        # 1. Καθαρίζουμε τα παλιά καρτελάκια
+        # Καθαρίζει το sidebar και εμφανίζει τα ενεργά δελτία
+        # Καθαρίζουμε τα παλιά δελτία
         for widget in self.tickets_display.winfo_children():
             widget.destroy()
             
-        # 2. Φτιάχνουμε τα νέα (μόνο για όσα δελτία έχουν ακόμα κληρώσεις!)
+        # Φτιάχνουμε τα νέα δελτία (όσα έχουν ακόμα κληρώσεις)
         for ticket_number, ticket_draws in self.paigmena_deltia.items():
             if ticket_draws["draws"] > 0:
                 nums_str = " - ".join(str(n) for n in self.paigmena_deltia[ticket_number]["arithmoi"])
@@ -264,22 +266,24 @@ class KinoGUI: # Η κλάση του KinoGui
                          font=("Arial", 10, "bold"), bg="#003366", fg="#00ffcc", 
                          relief="solid", borderwidth=1, padx=5, pady=5).pack(fill="x", pady=5)
 
-    def update_wallet_display(self, new_balance):
+    def update_wallet_display(self, new_balance): # Ενημερώνει το πορτοφόλι με το νέο υπόλοιπο μετά 
+        # από κάθε κλήρωση
         self.wallet_entry.delete(0, tk.END)
         self.wallet_entry.insert(0, f"{new_balance:.2f}")
 
-    def update_statistics(self, stats_data):
+    def update_statistics(self, stats_data): # Ενημερώνει τα στατιστικά με τα νέα δεδομένα που υπολογίζει
+        # ο controller μετά από κάθε κλήρωση
         self.stats_text.delete("1.0", tk.END)
         self.stats_text.insert(tk.END, stats_data)
 
-    def open_ticket_popup(self):
+    def open_ticket_popup(self): # Συνάρτηση που ανοίγει το παράθυρο για τη δημιουργία νέου δελτίου
         # Δημιουργία του αναδυόμενου παραθύρου
         popup = tk.Toplevel(self.root)
-        popup.title("Νέο Δελτίο")
+        popup.title("Νέο Δελτίο") # Τίτλος του νέου παραθύρου
         popup.geometry("800x500")
         popup.configure(bg="#001a33")
         
-        # Αυτό το κάνει "Modal" (δεν μπορείς να πατήσεις πίσω μέχρι να το κλείσεις)
+        # Αυτό το κάνει "Modal" και ο χρήστης δεν μπορεί αν πατήσει πουθενά αλλού μέχρι να το κλείσει
         popup.grab_set() 
 
         tk.Label(popup, text="Επιλέξτε έως 12 αριθμούς", font=("Arial", 16, "bold"), fg="#ffcc00", bg="#001a33").pack(pady=15)
@@ -302,7 +306,7 @@ class KinoGUI: # Η κλάση του KinoGui
         small_grid.pack(pady=10)
 
         for i in range(1, 81):
-            # Χρησιμοποιούμε μικρότερο μέγεθος για να χωράει όμορφα (π.χ. width=3, height=1 αντί για pixel κόλπα εδώ)
+            # Χρησιμοποιούμε μικρότερο μέγεθος για να χωράει το grid στο μικρότερο pop-up
             btn = tk.Button(small_grid, text=str(i), width=3, height=1,
                             font=("Arial", 9, "bold"), bg="#004488", fg="white",
                             relief="flat", cursor="hand2",
@@ -320,25 +324,30 @@ class KinoGUI: # Η κλάση του KinoGui
         ticket_draws_spinbox.pack(side="left")
 
         # Εσωτερική συνάρτηση για αποθήκευση
-        def save_ticket():
-            if not temp_selected:
+        def save_ticket(): 
+            # Ελέγχουμε αν ο χρήστης έχει επιλέξει τουλάχιστον έναν αριθμό και αν έχει δώσει έγκυρο 
+            # αριθμό κληρώσεων
+            if not temp_selected: # Αν δεν έχει επιλέξει κανέναν αριθμό, εμφανίζει προειδοποίηση και 
+                # επιστρέφει χωρίς να κάνει τίποτα
                 from tkinter import messagebox
                 messagebox.showwarning("Προσοχή", "Επιλέξτε τουλάχιστον έναν αριθμό!", parent=popup)
                 return
         
-            try:
+            try: # Ελέγχουμε αν οι κληρώσεις που έχει δώσει ο χρήστης είναι έγκυρος αριθμός και 
+                # αν είναι μέσα στα όρια (1-200)
                 draws_chosen = int(ticket_draws_spinbox.get())
-                if draws_chosen < 1:
+                if draws_chosen < 1: # Αν ο χρήστης ΔΕΝ έχει εισάγει έγκυρο αριθμό κληρώσεων
                     raise ValueError
-            except ValueError:
+            except ValueError: # Εμφανίζει το error της παραπάνω περίπτωσης
                 from tkinter import messagebox
                 messagebox.showwarning("Προσοχή", "Εισάγετε έναν έγκυρο αριθμό κληρώσεων!", parent=popup)
                 return
                 
-            # Μεταφέρουμε τους αριθμούς στην κεντρική λίστα του UI
+            # Δημιουργούμε το δελτίο με τους επιλεγμένους αριθμούς, τον αριθμό κληρώσεων και το περνάμε
+            # στο δεξιά sidebar με τα δελτία
             self.add_ticket_to_sidebar(temp_selected, draws=draws_chosen)
             
-            popup.destroy() # Κλείνει το pop-up
+            popup.destroy() # Κλείνει το pop-up παράθυρο
 
         # Κουμπιά ελέγχου του pop-up
         popup_actions = tk.Frame(popup, bg="#001a33")
